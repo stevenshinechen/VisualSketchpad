@@ -1,0 +1,19 @@
+[project]
+name = "visualsketchpad"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gradio-client>=1.5.2",
+    "gradio>=5.9.1",
+    "joblib>=1.4.2",
+    "matplotlib>=3.10.0",
+    "numpy>=1.26.4",
+    "opencv-python>=4.10.0.84",
+    "pillow>=11.0.0",
+    "pyautogen>=0.5.3",
+    "networkx>=3.4.2",
+    "scipy>=1.14.1",
+    "datasets>=3.2.0",
+]
