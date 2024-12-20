@@ -19,3 +19,8 @@ dependencies = [
     "ipdb>=0.13.13",
     "reportlab>=4.2.5",
 ]
+
+[dependency-groups]
+dev = [
+    "mlflow>=2.19.0",
+]
