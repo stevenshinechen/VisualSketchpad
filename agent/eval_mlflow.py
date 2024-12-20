@@ -7,6 +7,7 @@ from mlflow_utils import with_mlflow_server
 from config import llm_config
 import os
 from uuid import uuid4
+import json
 
 class IsobenchTask(StrEnum):
     CHEMISTRY = "chemistry"
@@ -31,14 +32,27 @@ async def run_agent_with_mlflow_on_isobench(task: IsobenchTask, task_id: int):
   all_messages, usage_summary = await arun_agent_on_isobench(task, task_id)
   answer_message = all_messages[-1]["content"][0]["text"]
   answer_message = answer_message.split("ANSWER:")[1].split("TERMINATE")[0]
-  mlflow.log_text(answer_message, f"{task_id}/answer.txt")
+  mlflow.log_text(answer_message, f"{task_id}/prediction.txt")
   mlflow.log_dict(all_messages, f"{task_id}/output.json")
   mlflow.log_dict(usage_summary, f"{task_id}/usage_summary.json")
+
+  task_json = read_isobench_task(task, task_id)
+  mlflow.log_text(task_json["label"], f"{task_id}/label.txt")
+  # TODO: Make more robust correctness check
+  correct = str(task_json["label"]) in answer_message
+  mlflow.log_text(str(correct), f"{task_id}/correct.txt")
+  return correct
+
+def read_isobench_task(task: IsobenchTask, task_id: int):
+  with open(f"../tasks/{task.value}/{task_id}/example.json") as f:
+    return json.load(f)
 
 async def run_all_on_isobench(task: IsobenchTask):
   task_ids = [int(f) for f in os.listdir(f"../tasks/{task.value}") if os.path.isdir(f"../tasks/{task.value}/{f}")]
   task_ids = task_ids[:2]
-  await tqdm.gather(*[run_agent_with_mlflow_on_isobench(task, task_id) for task_id in task_ids])
+  results = await tqdm.gather(*[run_agent_with_mlflow_on_isobench(task, task_id) for task_id in task_ids])
+  if results:
+    mlflow.log_metric("accuracy", sum(results) / len(results))
 
 def run_evaluation(task: IsobenchTask):
     mlflow.set_experiment(f"IsoBench: {task}")
