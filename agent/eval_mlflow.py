@@ -37,7 +37,7 @@ async def run_agent_with_mlflow_on_isobench(task: IsobenchTask, task_id: int):
   mlflow.log_dict(usage_summary, f"{task_id}/usage_summary.json")
 
   task_json = read_isobench_task(task, task_id)
-  mlflow.log_text(task_json["label"], f"{task_id}/label.txt")
+  mlflow.log_text(str(task_json["label"]), f"{task_id}/label.txt")
   # TODO: Make more robust correctness check
   correct = str(task_json["label"]) in answer_message
   mlflow.log_text(str(correct), f"{task_id}/correct.txt")
