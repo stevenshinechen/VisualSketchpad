@@ -130,5 +130,6 @@ def run_agent(task_input, output_dir, task_type="vision", task_name=None):
         
     user.reset()
     planner.reset()
-    
+
+    return all_messages, usage_summary
     
