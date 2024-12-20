@@ -29,6 +29,9 @@ async def arun_agent_on_isobench(task: IsobenchTask, task_id: int):
 
 async def run_agent_with_mlflow_on_isobench(task: IsobenchTask, task_id: int):
   all_messages, usage_summary = await arun_agent_on_isobench(task, task_id)
+  answer_message = all_messages[-1]["content"][0]["text"]
+  answer_message = answer_message.split("ANSWER:")[1].split("TERMINATE")[0]
+  mlflow.log_text(answer_message, f"{task_id}/answer.txt")
   mlflow.log_dict(all_messages, f"{task_id}/output.json")
   mlflow.log_dict(usage_summary, f"{task_id}/usage_summary.json")
 
